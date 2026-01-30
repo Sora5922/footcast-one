@@ -1,4 +1,4 @@
-/* --- [COPIER TOUT LE CONTENU CI-DESSOUS] --- */
+/* --- BASE DE DONNÉES --- */
 const themes = [
     { name: "Bleu de France", c1: "#00224c", c2: "#003f93", c3: "#4e88df" },
     { name: "Acajou", c1: "#4c2313", c2: "#934425", c3: "#d96536" },
@@ -30,8 +30,7 @@ const configTemplates = [
 
 const p1 = document.getElementById('picker1'), p2 = document.getElementById('picker2'), p3 = document.getElementById('picker3');
 const t1 = document.getElementById('hex1'), t2 = document.getElementById('hex2'), t3 = document.getElementById('hex3');
-const grid = document.getElementById('presets-grid');
-const customGrid = document.getElementById('custom-presets-grid');
+const grid = document.getElementById('presets-grid'), customGrid = document.getElementById('custom-presets-grid');
 const thumbBar = document.getElementById('template-bar');
 
 function update(c1, c2, c3, selectedCard = null) {
@@ -44,9 +43,19 @@ function update(c1, c2, c3, selectedCard = null) {
     if (selectedCard) selectedCard.classList.add('active');
 }
 
+function setComplexMask(el, imgPath) {
+    el.style.backgroundImage = `url('${imgPath}')`;
+    el.style.backgroundSize = "contain";
+    el.style.backgroundRepeat = "no-repeat";
+    el.style.backgroundPosition = "center";
+    el.style.backgroundBlendMode = "multiply";
+    el.style.webkitMaskImage = `url('${imgPath}')`;
+    el.style.maskImage = `url('${imgPath}')`;
+}
+
 function switchTemplate(temp) {
     const main = document.getElementById('main-view');
-    main.classList.remove('base-below', 'layer-above', 'l3b-above', 't9-style', 't10-style', 't12-style');
+    main.className = 'tv-screen'; 
     if (temp.id === "t3") main.classList.add('base-below');
     if (temp.id === "t6") main.classList.add('layer-above'); 
     if (temp.id === "t8") main.classList.add('l3b-above');  
@@ -58,43 +67,38 @@ function switchTemplate(temp) {
     const activeThumb = document.getElementById(`thumb-${temp.id}`);
     if(activeThumb) activeThumb.classList.add('active');
     
-    main.querySelector('.bg-target').src = `${temp.path}/background.png`;
+    // Background unique à la racine
+    main.querySelector('.bg-target').src = `img/background.png`;
+
     const bBis = main.querySelector('.base-bis-target');
-    bBis.style.display = "block";
-    bBis.src = `${temp.path}/base_bis.png`;
+    bBis.style.display = "block"; bBis.src = `${temp.path}/base_bis.png`;
     bBis.onerror = () => bBis.style.display = "none";
+    
     main.querySelector('.base-target').src = `${temp.path}/base.png`;
     main.querySelector('.overlay-target').src = `${temp.path}/dirty.png`;
     
-    const setMask = (cl, img) => {
-        const el = main.querySelectorAll(cl);
-        el.forEach(m => {
-            m.style.maskImage = `url('${temp.path}/${img}')`;
-            m.style.webkitMaskImage = `url('${temp.path}/${img}')`;
-        });
+    const apply = (cl, img) => {
+        main.querySelectorAll(cl).forEach(m => setComplexMask(m, `${temp.path}/${img}`));
     };
-    setMask('.l1-target', 'calque1.png'); setMask('.l1b-target', 'calque1_bis.png');
-    setMask('.l2-target', 'calque2.png'); setMask('.l2b-target', 'calque2_bis.png');
-    setMask('.l3-target', 'calque3.png'); setMask('.l3b-target', 'calque3_bis.png');
+
+    apply('.l1-target', 'calque1.png'); apply('.l1b-target', 'calque1_bis.png');
+    apply('.l2-target', 'calque2.png'); apply('.l2b-target', 'calque2_bis.png');
+    apply('.l3-target', 'calque3.png'); apply('.l3b-target', 'calque3_bis.png');
     update(p1.value, p2.value, p3.value);
 }
 
 function initTemplates() {
     configTemplates.forEach(temp => {
-        const container = document.createElement('div');
-        container.className = 'template-item';
+        const item = document.createElement('div');
+        item.className = 'template-item';
         const thumb = document.createElement('div');
         thumb.className = 'template-thumb';
-        if (temp.id === "t3") thumb.classList.add('base-below');
-        if (temp.id === "t6") thumb.classList.add('layer-above'); 
-        if (temp.id === "t8") thumb.classList.add('l3b-above');  
-        if (temp.id === "t9") thumb.classList.add('t9-style');
-        if (temp.id === "t10") thumb.classList.add('t10-style');
-        if (temp.id === "t12") thumb.classList.add('t12-style');
-        
         thumb.id = `thumb-${temp.id}`;
+        if (temp.id === "t3") thumb.classList.add('base-below');
+        if (temp.id === "t6") thumb.classList.add('layer-above');
+        
         thumb.innerHTML = `
-            <img src="${temp.path}/background.png" class="img-layer">
+            <img src="img/background.png" class="img-layer">
             <div class="mask-layer l1b-target"></div><div class="mask-layer l2b-target"></div>
             <div class="mask-layer l1-target"></div><div class="mask-layer l2-target"></div>
             <div class="mask-layer l3-target"></div><div class="mask-layer l3b-target"></div>
@@ -102,43 +106,45 @@ function initTemplates() {
             <img src="${temp.path}/base.png" class="img-layer base-target">
             <img src="${temp.path}/dirty.png" class="img-layer overlay-target">`;
         
-        thumb.querySelectorAll('.mask-layer').forEach((m) => {
-            let file = m.classList.contains('l1-target') ? 'calque1.png' : 
-                       m.classList.contains('l1b-target') ? 'calque1_bis.png' :
-                       m.classList.contains('l2-target') ? 'calque2.png' :
-                       m.classList.contains('l2b-target') ? 'calque2_bis.png' :
-                       m.classList.contains('l3-target') ? 'calque3.png' : 'calque3_bis.png';
-            m.style.webkitMaskImage = `url('${temp.path}/${file}')`;
-            m.style.maskImage = `url('${temp.path}/${file}')`;
+        thumb.querySelectorAll('.mask-layer').forEach(m => {
+            let f = m.classList.contains('l1-target') ? 'calque1.png' : 
+                    m.classList.contains('l1b-target') ? 'calque1_bis.png' :
+                    m.classList.contains('l2-target') ? 'calque2.png' :
+                    m.classList.contains('l2b-target') ? 'calque2_bis.png' :
+                    m.classList.contains('l3-target') ? 'calque3.png' : 'calque3_bis.png';
+            setComplexMask(m, `${temp.path}/${f}`);
         });
         
         const label = document.createElement('span');
         label.className = 'template-label';
         label.innerText = temp.name;
         thumb.onclick = () => switchTemplate(temp);
-        container.appendChild(thumb); container.appendChild(label);
-        thumbBar.appendChild(container);
+        item.appendChild(thumb); item.appendChild(label);
+        thumbBar.appendChild(item);
     });
 }
 
 function createCard(t, targetGrid, isCustom = false, index = null) {
     const card = document.createElement('div');
     card.className = 'preset-card';
-    card.innerHTML = `<span style="font-size:11px;">${t.name}</span>
-        <div class="swatch-box">
-            <div class="swatch" style="background:${t.c1}"></div>
-            <div class="swatch" style="background:${t.c2}"></div>
-            <div class="swatch" style="background:${t.c3}"></div>
-        </div>` + (isCustom ? `<div class="delete-icon"><i class="fa-solid fa-trash"></i></div>` : '');
+    let html = `<span style="font-size:11px;">${t.name}</span><div class="swatch-box"><div class="swatch" style="background:${t.c1}"></div><div class="swatch" style="background:${t.c2}"></div><div class="swatch" style="background:${t.c3}"></div></div>`;
+    if (isCustom) html += `<div class="edit-icon"><i class="fa-solid fa-pen"></i></div><div class="delete-icon"><i class="fa-solid fa-trash"></i></div>`;
+    card.innerHTML = html;
     card.onclick = () => update(t.c1, t.c2, t.c3, card);
     if (isCustom) {
+        card.querySelector('.edit-icon').onclick = (e) => {
+            e.stopPropagation();
+            let n = prompt("Nom :", t.name);
+            if (n && n !== t.name) {
+                let s = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
+                s[index].name = n; localStorage.setItem('myFootcastThemes', JSON.stringify(s)); loadCustomThemes();
+            }
+        };
         card.querySelector('.delete-icon').onclick = (e) => {
             e.stopPropagation();
-            if(confirm(`Supprimer "${t.name}" ?`)) {
-                let saved = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
-                saved.splice(index, 1);
-                localStorage.setItem('myFootcastThemes', JSON.stringify(saved));
-                loadCustomThemes();
+            if(confirm(`Supprimer ?`)) {
+                let s = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
+                s.splice(index, 1); localStorage.setItem('myFootcastThemes', JSON.stringify(s)); loadCustomThemes();
             }
         };
     }
@@ -152,6 +158,7 @@ function loadCustomThemes() {
     saved.forEach((t, idx) => createCard(t, customGrid, true, idx));
 }
 
+// Initialisation
 initTemplates();
 let firstCard;
 themes.forEach((t, idx) => {
@@ -159,39 +166,29 @@ themes.forEach((t, idx) => {
     if (idx === 0) firstCard = card;
 });
 loadCustomThemes();
-
 update(themes[0].c1, themes[0].c2, themes[0].c3, firstCard);
 switchTemplate(configTemplates[0]);
 
-[p1, p2, p3].forEach(p => {
-    p.oninput = () => update(p1.value, p2.value, p3.value);
-});
+[p1, p2, p3].forEach(p => p.oninput = () => update(p1.value, p2.value, p3.value));
 
 document.getElementById('save-btn').onclick = () => {
-    let name = prompt("Nom du thème :", "Nouveau Thème");
-    if (name) {
-        let saved = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
-        saved.push({ name, c1: p1.value, c2: p2.value, c3: p3.value });
-        localStorage.setItem('myFootcastThemes', JSON.stringify(saved));
-        loadCustomThemes();
+    let n = prompt("Nom :", "Nouveau Thème");
+    if (n) {
+        let s = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
+        s.push({ name: n, c1: p1.value, c2: p2.value, c3: p3.value });
+        localStorage.setItem('myFootcastThemes', JSON.stringify(s)); loadCustomThemes();
     }
 };
 
 document.getElementById('export-btn').onclick = function() {
-    const btn = this;
-    const code = p1.value.toUpperCase() + "-" + p2.value.toUpperCase() + "-" + p3.value.toUpperCase();
+    const code = `${p1.value}-${p2.value}-${p3.value}`.toUpperCase();
     const el = document.createElement('textarea');
     el.value = code; document.body.appendChild(el); el.select();
     document.execCommand('copy'); document.body.removeChild(el);
-    
-    const originalContent = btn.innerHTML;
-    btn.classList.add('export-success');
-    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copié !';
-    
-    setTimeout(() => { 
-        btn.classList.remove('export-success'); 
-        btn.innerHTML = originalContent; 
-    }, 1500);
+    const original = this.innerHTML;
+    this.classList.add('export-success');
+    this.innerHTML = '<i class="fa-solid fa-check"></i> Copié !';
+    setTimeout(() => { this.classList.remove('export-success'); this.innerHTML = original; }, 1500);
 };
 
 document.getElementById('import-btn').onclick = function() {
@@ -199,22 +196,41 @@ document.getElementById('import-btn').onclick = function() {
     if (code) {
         const colors = code.split('-');
         if (colors.length === 3) {
-            let name = prompt("Nom pour ce nouveau thème ?", "Importé");
-            if(name) {
+            let n = prompt("Nom ?", "Importé");
+            if(n) {
                 const c1 = colors[0].trim(), c2 = colors[1].trim(), c3 = colors[2].trim();
                 update(c1, c2, c3);
-                let saved = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
-                saved.push({ name, c1, c2, c3 });
-                localStorage.setItem('myFootcastThemes', JSON.stringify(saved));
-                loadCustomThemes();
+                let s = JSON.parse(localStorage.getItem('myFootcastThemes')) || [];
+                s.push({ name: n, c1, c2, c3 });
+                localStorage.setItem('myFootcastThemes', JSON.stringify(s)); loadCustomThemes();
             }
-        } else alert("Format invalide !");
+        } else alert("Invalide !");
     }
 };
 
-document.getElementById('clear-custom-btn').onclick = () => {
-    if(confirm("Tout effacer ?")) {
-        localStorage.removeItem('myFootcastThemes');
-        loadCustomThemes();
+document.getElementById('clear-custom-btn').onclick = () => { if(confirm("Effacer tout ?")) { localStorage.removeItem('myFootcastThemes'); loadCustomThemes(); } };
+
+/* --- LOGIQUE PLEIN ÉCRAN --- */
+const fullscreenWrapper = document.getElementById('fullscreen-wrapper');
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+const exitFullscreenBtn = document.getElementById('exit-fullscreen-btn');
+
+fullscreenBtn.onclick = () => {
+    if (fullscreenWrapper.requestFullscreen) {
+        fullscreenWrapper.requestFullscreen();
+    } else if (fullscreenWrapper.webkitRequestFullscreen) { /* Safari */
+        fullscreenWrapper.webkitRequestFullscreen();
+    } else if (fullscreenWrapper.msRequestFullscreen) { /* IE11 */
+        fullscreenWrapper.msRequestFullscreen();
+    }
+};
+
+exitFullscreenBtn.onclick = () => {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
     }
 };

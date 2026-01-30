@@ -13,7 +13,13 @@
             <div class="render-container">
                 <h1 class="main-title">Générateur <span class="no-break">Footcast-one</span></h1>
                 
-                <div class="screen-resizer">
+                <div class="screen-header-actions">
+                    <button id="fullscreen-btn" class="icon-btn" title="Mode Plein Écran">
+                        <i class="fa-solid fa-expand"></i> Plein écran
+                    </button>
+                </div>
+
+                <div class="screen-resizer" id="fullscreen-wrapper">
                     <div class="tv-screen" id="main-view">
                         <img src="" class="img-layer bg-target">
                         <div class="mask-layer l1b-target"></div>
@@ -25,24 +31,25 @@
                         <img src="" class="img-layer base-bis-target">
                         <img src="" class="img-layer base-target">
                         <img src="" class="img-layer overlay-target">
+                        
+                        <button id="exit-fullscreen-btn" class="exit-btn">
+                            <i class="fa-solid fa-compress"></i> Quitter le plein écran
+                        </button>
                     </div>
                 </div>
-                
                 <div class="divider section-divider"></div>
                 <div class="template-selector-bar" id="template-bar"></div>
             </div>
         </div>
-
         <div class="sidebar">
-            <div class="sidebar-header"><h2>Personnalisation</h2></div>
-            
+            <div class="sidebar-header">
+                <h2>Personnalisation</h2>
+            </div>
             <div class="ui-section section-presets">
                 <h3>Thèmes Prédéfinis</h3>
                 <div id="presets-grid" class="presets-grid"></div>
             </div>
-
             <div class="divider"></div>
-
             <div class="ui-section">
                 <h3>Ajustement Manuel</h3>
                 <div class="manual-controls">
@@ -64,13 +71,12 @@
                 </div>
                 <button id="save-btn" class="action-btn">Sauvegarder ce thème</button>
                 <div class="share-group">
-                    <button id="export-btn" class="share-btn"><i class="fa-solid fa-copy"></i> <span>Exporter</span></button>
+                    <button id="export-btn" class="share-btn"><i class="fa-solid fa-copy"></i>
+                        <span>Exporter</span></button>
                     <button id="import-btn" class="share-btn"><i class="fa-solid fa-file-import"></i> Importer</button>
                 </div>
             </div>
-
             <div class="divider"></div>
-
             <div class="ui-section section-custom">
                 <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <h3 style="margin:0;">Mes Thèmes</h3>
@@ -81,5 +87,13 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true" focusable="false">
+        <filter id="luminance-to-alpha">
+            <feColorMatrix type="matrix" values="0 0 0 0 1
+                                         0 0 0 0 1
+                                         0 0 0 0 1
+                                         0.33 0.33 0.33 0 0" />
+        </filter>
+    </svg>
 </body>
 </html>
