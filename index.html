@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur Footcast-one</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="render-area">
+            <div class="render-container">
+                <h1 class="main-title">Générateur <span class="no-break">Footcast-one</span></h1>
+                
+                <div class="screen-resizer">
+                    <div class="tv-screen" id="main-view">
+                        <img src="" class="img-layer bg-target">
+                        <div class="mask-layer l1b-target"></div>
+                        <div class="mask-layer l2b-target"></div>
+                        <div class="mask-layer l1-target"></div>
+                        <div class="mask-layer l2-target"></div>
+                        <div class="mask-layer l3-target"></div>
+                        <div class="mask-layer l3b-target"></div>
+                        <img src="" class="img-layer base-bis-target">
+                        <img src="" class="img-layer base-target">
+                        <img src="" class="img-layer overlay-target">
+                    </div>
+                </div>
+                
+                <div class="divider section-divider"></div>
+                <div class="template-selector-bar" id="template-bar"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-header"><h2>Personnalisation</h2></div>
+            
+            <div class="ui-section section-presets">
+                <h3>Thèmes Prédéfinis</h3>
+                <div id="presets-grid" class="presets-grid"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ui-section">
+                <h3>Ajustement Manuel</h3>
+                <div class="manual-controls">
+                    <div class="picker-group">
+                        <label>C1</label>
+                        <input type="color" id="picker1">
+                        <span id="hex1" class="hex-label">#000000</span>
+                    </div>
+                    <div class="picker-group">
+                        <label>C2</label>
+                        <input type="color" id="picker2">
+                        <span id="hex2" class="hex-label">#000000</span>
+                    </div>
+                    <div class="picker-group">
+                        <label>C3</label>
+                        <input type="color" id="picker3">
+                        <span id="hex3" class="hex-label">#000000</span>
+                    </div>
+                </div>
+                <button id="save-btn" class="action-btn">Sauvegarder ce thème</button>
+                <div class="share-group">
+                    <button id="export-btn" class="share-btn"><i class="fa-solid fa-copy"></i> <span>Exporter</span></button>
+                    <button id="import-btn" class="share-btn"><i class="fa-solid fa-file-import"></i> Importer</button>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="ui-section section-custom">
+                <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin:0;">Mes Thèmes</h3>
+                    <button id="clear-custom-btn" class="clear-btn"><i class="fa-solid fa-trash-can"></i> Effacer</button>
+                </div>
+                <div id="custom-presets-grid" class="presets-grid"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
