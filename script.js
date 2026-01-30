@@ -55,7 +55,7 @@ function setComplexMask(el, imgPath) {
 
 function switchTemplate(temp) {
     const main = document.getElementById('main-view');
-    main.className = 'tv-screen'; 
+    main.className = 'tv-screen no-context'; 
     if (temp.id === "t3") main.classList.add('base-below');
     if (temp.id === "t6") main.classList.add('layer-above'); 
     if (temp.id === "t8") main.classList.add('l3b-above');  
@@ -67,7 +67,6 @@ function switchTemplate(temp) {
     const activeThumb = document.getElementById(`thumb-${temp.id}`);
     if(activeThumb) activeThumb.classList.add('active');
     
-    // Background unique à la racine
     main.querySelector('.bg-target').src = `img/background.png`;
 
     const bBis = main.querySelector('.base-bis-target');
@@ -92,7 +91,7 @@ function initTemplates() {
         const item = document.createElement('div');
         item.className = 'template-item';
         const thumb = document.createElement('div');
-        thumb.className = 'template-thumb';
+        thumb.className = 'template-thumb no-context'; // Ajout de la classe ici
         thumb.id = `thumb-${temp.id}`;
         if (temp.id === "t3") thumb.classList.add('base-below');
         if (temp.id === "t6") thumb.classList.add('layer-above');
@@ -119,16 +118,23 @@ function initTemplates() {
         label.className = 'template-label';
         label.innerText = temp.name;
         thumb.onclick = () => switchTemplate(temp);
+        
+        // Blocage du clic droit sur la vignette
+        thumb.oncontextmenu = (e) => e.preventDefault();
+
         item.appendChild(thumb); item.appendChild(label);
         thumbBar.appendChild(item);
     });
 }
 
+// Blocage du clic droit sur l'écran principal
+document.getElementById('main-view').oncontextmenu = (e) => e.preventDefault();
+
 function createCard(t, targetGrid, isCustom = false, index = null) {
     const card = document.createElement('div');
     card.className = 'preset-card';
     let html = `<span style="font-size:11px;">${t.name}</span><div class="swatch-box"><div class="swatch" style="background:${t.c1}"></div><div class="swatch" style="background:${t.c2}"></div><div class="swatch" style="background:${t.c3}"></div></div>`;
-    if (isCustom) html += `<div class="edit-icon"><i class="fa-solid fa-pen"></i></div><div class="delete-icon"><i class="fa-solid fa-trash"></i></div>`;
+    if (isCustom) html += `<div class="edit-icon"><i class="fa-solid fa-pen"></i></div><div class="delete-icon"><i class="fa-solid fa-trash-can"></i></div>`;
     card.innerHTML = html;
     card.onclick = () => update(t.c1, t.c2, t.c3, card);
     if (isCustom) {
@@ -158,7 +164,6 @@ function loadCustomThemes() {
     saved.forEach((t, idx) => createCard(t, customGrid, true, idx));
 }
 
-// Initialisation
 initTemplates();
 let firstCard;
 themes.forEach((t, idx) => {
@@ -210,27 +215,37 @@ document.getElementById('import-btn').onclick = function() {
 
 document.getElementById('clear-custom-btn').onclick = () => { if(confirm("Effacer tout ?")) { localStorage.removeItem('myFootcastThemes'); loadCustomThemes(); } };
 
-/* --- LOGIQUE PLEIN ÉCRAN --- */
+/* --- GESTION DU PLEIN ÉCRAN / MODE FOCUS --- */
 const fullscreenWrapper = document.getElementById('fullscreen-wrapper');
+const dashboard = document.getElementById('dashboard');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
 const exitFullscreenBtn = document.getElementById('exit-fullscreen-btn');
 
-fullscreenBtn.onclick = () => {
-    if (fullscreenWrapper.requestFullscreen) {
-        fullscreenWrapper.requestFullscreen();
-    } else if (fullscreenWrapper.webkitRequestFullscreen) { /* Safari */
-        fullscreenWrapper.webkitRequestFullscreen();
-    } else if (fullscreenWrapper.msRequestFullscreen) { /* IE11 */
-        fullscreenWrapper.msRequestFullscreen();
+function toggleFocusMode() {
+    const isMobile = window.innerWidth <= 1024;
+    if (isMobile) {
+        const isFocus = dashboard.classList.toggle('focus-active');
+        if (isFocus) {
+            fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i> Quitter';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i> Plein écran';
+        }
+    } else {
+        if (fullscreenWrapper.requestFullscreen) {
+            fullscreenWrapper.requestFullscreen();
+        } else if (fullscreenWrapper.webkitRequestFullscreen) {
+            fullscreenWrapper.webkitRequestFullscreen();
+        }
     }
-};
+}
+
+fullscreenBtn.onclick = toggleFocusMode;
 
 exitFullscreenBtn.onclick = () => {
     if (document.exitFullscreen) {
         document.exitFullscreen();
     } else if (document.webkitExitFullscreen) {
         document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
     }
 };
